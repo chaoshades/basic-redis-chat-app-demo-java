@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: chat-app-svc
+  namespace: chat-app-demo
+  labels:
+    app: chat-app
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: chat-app
+    tier: frontend
+  type: ClusterIP
