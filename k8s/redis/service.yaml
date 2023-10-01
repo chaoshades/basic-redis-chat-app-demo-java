@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: redis-svc
+  namespace: chat-app-demo
+  labels:
+    app: chat-app
+spec:
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+  selector:
+    app: chat-app
+    tier: redis
+  type: ClusterIP

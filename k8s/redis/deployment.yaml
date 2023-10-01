@@ -1,0 +1,65 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: redis
+  namespace: chat-app-demo
+  labels:
+    app: chat-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-app
+      tier: redis
+  template:
+    metadata:
+      labels:
+        app: chat-app
+        tier: redis
+    spec:
+      volumes:
+        - name: redis-persistent-storage
+          persistentVolumeClaim:
+            claimName: redis-pv-claim
+      containers:
+        - name: redis
+          image: redis
+          command:
+            - redis-server
+          args:
+            - '--requirepass'
+            - $(REDIS_PASSWORD)
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: password
+          resources:
+            limits:
+              cpu: 100m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          volumeMounts:
+            - name: redis-persistent-storage
+              mountPath: /data
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - '-c'
+                - redis-cli -a $(REDIS_PASSWORD) ping
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          imagePullPolicy: IfNotPresent
+  strategy:
+    type: Recreate

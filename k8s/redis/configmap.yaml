@@ -1,0 +1,7 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: redis-cm
+  namespace: chat-app-demo
+data:
+  url: redis-svc.chat-app-demo.svc.cluster.local:6379
