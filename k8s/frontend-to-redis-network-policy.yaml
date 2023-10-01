@@ -1,0 +1,22 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: frontend-to-redis-network-policy
+  namespace: chat-app-demo
+spec:
+  podSelector:
+    matchLabels:
+      tier: redis
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 6379
+      from:
+        - namespaceSelector:
+            matchLabels:
+              project: chat-app-demo
+        - podSelector:
+            matchLabels:
+              tier: frontend
+  policyTypes:
+    - Ingress
